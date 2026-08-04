@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+build/
+dist/
+npm-debug.log*
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*credential*
+*secret*
+
+# Logs
+*.log
+logs/
+
+# Docker volumes / data
+docker-data/
+volumes/
+*.sqlite
+*.sqlite3
+*.db
+
+# Selenium / chromedriver
+chromedriver
+chromedriver.exe
+*chromedriver*
+
+# Repomix dumps (pueden contener secretos volcados de .env)
+repomix-output.txt
+repomix-output.*
+
+# OS
+.DS_Store
+Thumbs.db
+backups/

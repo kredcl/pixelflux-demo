@@ -1,0 +1,12 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+SQLAlchemy==2.0.35
+pymysql==1.1.1
+python-jose[cryptography]==3.3.0
+argon2-cffi==23.1.0
+pydantic==2.9.2
+requests==2.*
+openai>=1.0.0,<2
+httpx[http2]>=0.27
+beautifulsoup4>=4.12
+tldextract==3.5.0

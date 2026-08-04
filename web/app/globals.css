@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===========================
+   Variables y tokens básicos
+   =========================== */
+:root {
+  /* Gutter que reservamos cuando el sidebar está colapsado
+     para que el botón/handle no tape el contenido */
+  --sidebar-gutter: 24px;
+
+  /* Colores de la UI (coinciden con lo mostrado en el diseño) */
+  --dark-bg: #0f2a25;      /* fondo panel lateral */
+  --dark-fg: #0b1d1a;      /* acentos oscuros */
+  --chip-ok-bg: #dcfce7;   /* verde muy claro */
+  --chip-ok-fg: #065f46;   /* verde texto */
+  --chip-muted-bg: #e5e7eb;/* gris claro */
+  --chip-muted-fg: #374151;/* gris texto */
+}
+
+/* Fondo oscuro reutilizable para sidebars */
+.bg-dark {
+  background-color: var(--dark-bg);
+}
+
+/* ===========================
+   Transiciones de layout
+   =========================== */
+.g-cols-smooth {
+  transition: grid-template-columns 250ms ease;
+}
+
+.opacity-smooth {
+  transition: opacity 200ms ease;
+}
+
+/* ===========================
+   Handle del sidebar
+   =========================== */
+.collapse-handle {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 9999px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  font-weight: 700;
+}
+
+/* Cuando la vista reserve el gutter (ej. campañas),
+   esta clase da la plantilla con el espacio a la izquierda */
+.with-left-gutter {
+  grid-template-columns: var(--sidebar-gutter) 1fr;
+}
+
+/* ===========================
+   Chips/badges (opcional)
+   =========================== */
+.chip {
+  display: inline-block;
+  font-size: 11px;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+.chip--ok {
+  background: var(--chip-ok-bg);
+  color: var(--chip-ok-fg);
+}
+.chip--muted {
+  background: var(--chip-muted-bg);
+  color: var(--chip-muted-fg);
+}
+
+/* ===========================
+   Scrollbars sutiles (opc.)
+   =========================== */
+@supports (scrollbar-width: thin) {
+  .scroll-thin {
+    scrollbar-width: thin;
+  }
+}
+.scroll-thin::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,.15);
+  border-radius: 8px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+  

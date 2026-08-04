@@ -1,0 +1,100 @@
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_APP_USER}
+      MYSQL_PASSWORD: ${DB_APP_PASSWORD}
+      TZ: ${TZ}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin --protocol=TCP -uroot -p$$MYSQL_ROOT_PASSWORD ping | grep -q 'mysqld is alive' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+    networks: [pixnet]
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: mysql+pymysql://${DB_APP_USER}:${DB_APP_PASSWORD}@db:${DB_PORT:-3306}/${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      META_VERIFY_TOKEN: ${META_VERIFY_TOKEN}
+      META_SYSTEM_USER_TOKEN: ${META_SYSTEM_USER_TOKEN}
+      META_PHONE_NUMBER_ID: ${META_PHONE_NUMBER_ID}
+      META_WABA_ID: ${META_WABA_ID}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_MODEL: gpt-4o-mini
+      OPENAI_INPUT_COST_PER_1K: "0.00015"
+      OPENAI_OUTPUT_COST_PER_1K: "0.0006"
+      TZ: ${TZ}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      # Permitir app y audit (separados por coma, sin espacios)
+      CORS_ORIGINS: "https://${APP_DOMAIN:-app.pixelfluxcreative.com},https://${AUDIT_DOMAIN:-audit.pixelfluxcreative.com}"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+    networks: [pixnet]
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+        NEXT_PUBLIC_WABA_URL: ${NEXT_PUBLIC_WABA_URL}
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+      NEXT_PUBLIC_WABA_URL: ${NEXT_PUBLIC_WABA_URL}
+      TZ: ${TZ}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+    networks: [pixnet]
+
+  caddy:
+    image: caddy:2.8
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      web:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    environment:
+      TZ: ${TZ}
+    networks: [pixnet]
+
+volumes:
+  db_data: {}
+  caddy_data: {}
+  caddy_config: {}
+
+networks:
+  pixnet:
+    driver: bridge
+
