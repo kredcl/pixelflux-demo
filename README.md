@@ -1,40 +1,40 @@
-# PixelFlux — Lead Intelligence Platform (demo público)
+# PixelFlux — Lead Intelligence Platform (public demo)
 
-Este repo es una **versión sanitizada de un sistema real en producción**, adaptada como pieza de portafolio para postulaciones de trabajo.
+This repo is a **sanitized version of a real production system**, adapted as a portfolio piece for job applications.
 
-Demo en vivo: `https://demo.pixelfluxcreative.com` *(en construcción)*
+Live demo: `https://demo.pixelfluxcreative.com`
 
-## Qué es esto
+## What this is
 
-PixelFlux es una plataforma que encuentra negocios con presencia digital débil, los puntúa automáticamente con IA, genera auditorías personalizadas de su sitio/redes, y gestiona el contacto inicial con supervisión humana. Corre en producción desde 2025, con más de 10.000 leads calificados y un partnership activo en Canadá.
+PixelFlux is a platform that finds businesses with weak digital presence, scores them automatically with AI, generates personalized audits of their site/social presence, and manages first contact with human oversight. It's been in production since 2025, with over 10,000 qualified leads and an active partnership in Canada.
 
-Este repo muestra la arquitectura y el código real del sistema — **pero todos los datos que ves acá (negocios, contactos, conversaciones) son 100% ficticios**, generados para la demo. Nada de esto pertenece a un cliente real.
+This repo shows the real architecture and code — **but everything you see here (businesses, contacts, conversations) is 100% fictional**, generated for the demo. None of it belongs to a real client.
 
-## Qué es real y qué está simulado en esta demo
+## What's real vs. simulated in this demo
 
-| Componente | Estado |
+| Component | Status |
 |---|---|
-| Scoring de oportunidad, clasificación de sitio, generación de auditorías | **Real** — mismo código que producción, corrido sobre datos sintéticos al sembrar |
-| Dashboard y agregaciones | **Real** — funcionando contra la data sintética |
-| Links de auditoría tokenizados | **Real** — generados y servidos de verdad |
-| Scraper (Google Maps) | **Deshabilitado** — la interfaz se ve pero no ejecuta búsquedas reales |
-| Envío de WhatsApp (Meta Graph API) | **Mockeado** — conversaciones pre-sembradas, sin llamadas salientes reales |
+| Opportunity scoring, website classification, audit generation | **Real** — same code as production, run against synthetic data at seed time |
+| Dashboard and aggregations | **Real** — working against the synthetic data |
+| Tokenized audit links | **Real** — genuinely generated and served |
+| Scraper (Google Maps) | **Disabled** — the interface is there, but it doesn't run real searches |
+| WhatsApp sending (Meta Graph API) | **Mocked** — pre-seeded conversations, no real outbound calls |
 
-Ninguna interacción de un visitante público de la demo dispara una llamada real a un proveedor externo (Anthropic, Meta, o cualquier fetch a un sitio de terceros).
+No interaction from a public demo visitor ever triggers a real call to an external provider (OpenAI, Meta, or a fetch to a third-party site).
 
 ## Stack
 
 - **API:** FastAPI (Python) + SQLAlchemy + MariaDB
 - **Web:** Next.js (TypeScript) + Tailwind
 
-## Correr localmente
+## Run locally
 
 ```bash
 cp .env.example .env
-# completar .env con valores propios
+# fill in .env with your own values
 docker compose up --build
 ```
 
-## Contacto
+## Contact
 
-Construido por Derek Folch como pieza de portafolio. [derek.folch@gmail.com](mailto:derek.folch@gmail.com)
+Built by Derek Folch as a portfolio piece. [derek.folch@gmail.com](mailto:derek.folch@gmail.com)
