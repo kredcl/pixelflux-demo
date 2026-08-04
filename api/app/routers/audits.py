@@ -1,5 +1,5 @@
 # app/routers/audits.py
-import secrets, json
+import os, secrets, json
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
 
@@ -23,6 +23,14 @@ from app.models import (
 from app.routers.leads import _order_nulls_last
 
 router = APIRouter(prefix="/audits", tags=["audits"])
+
+# Generar nuevos links de auditoría, o revocar/renovar los existentes, muta
+# estado que un visitante sin login podría alcanzar directo por API — se
+# deshabilita en modo demo igual que el resto de escrituras (ver
+# DEMO_READONLY en main.py / scraper.py / leads.py / campaigns.py). El
+# tracking de CTA clicks (más abajo) queda fuera a propósito: es la métrica
+# de interactividad que la demo está pensada para mostrar.
+DEMO_READONLY = os.getenv("DEMO_READONLY", "true").lower() == "true"
 
 
 # ---------- Helpers básicos ----------
@@ -373,13 +381,13 @@ def _build_payload(
 
         if kind == AuditKind.BASIC:
             extra = (
-                " Esta auditoría básica te muestra los puntos clave de tu presencia digital hoy. "
-                "Si quieres, en la versión Premium podemos revisar contigo un plan más completo paso a paso."
+                " This basic audit shows you the key points of your digital presence today. "
+                "If you'd like, in the Premium version we can walk you through a more complete, step-by-step plan."
             )
         else:
             extra = (
-                " Esta auditoría Premium está pensada para que, en una breve reunión, "
-                "podamos convertir estos hallazgos en un plan concreto para tu negocio."
+                " This Premium audit is designed so that, in a short meeting, "
+                "we can turn these findings into a concrete plan for your business."
             )
 
         return (base + " " + extra).strip()
@@ -439,6 +447,11 @@ def generate_basic_for_campaign(
     days_valid: int = 7,
     db: Session = Depends(get_db),
 ):
+    if DEMO_READONLY:
+        raise HTTPException(
+            status_code=403,
+            detail="Modo demo: generar nuevos links de auditoría está deshabilitado. Los links que ves ya fueron generados al sembrar la demo.",
+        )
     camp = db.get(Campaign, campaign_id)
     if not camp:
         raise HTTPException(status_code=404, detail="Campaña no encontrada")
@@ -505,6 +518,11 @@ def generate_premium_for_campaign(
     days_valid: int = 10,
     db: Session = Depends(get_db),
 ):
+    if DEMO_READONLY:
+        raise HTTPException(
+            status_code=403,
+            detail="Modo demo: generar nuevos links de auditoría está deshabilitado. Los links que ves ya fueron generados al sembrar la demo.",
+        )
     camp = db.get(Campaign, campaign_id)
     if not camp:
         raise HTTPException(status_code=404, detail="Campaña no encontrada")
@@ -715,6 +733,11 @@ def list_links_for_campaign(
 # --- REVOCAR (deshabilitar) LINK ---
 @router.post("/{audit_id}/revoke")
 def revoke_link(audit_id: int, db: Session = Depends(get_db)):
+    if DEMO_READONLY:
+        raise HTTPException(
+            status_code=403,
+            detail="Modo demo: revocar links de auditoría está deshabilitado.",
+        )
     a = db.get(Audit, audit_id)
     if not a:
         raise HTTPException(status_code=404, detail="No existe")
@@ -729,6 +752,11 @@ def revoke_link(audit_id: int, db: Session = Depends(get_db)):
 def renew_link(
     audit_id: int, days_valid: int = 7, db: Session = Depends(get_db)
 ):
+    if DEMO_READONLY:
+        raise HTTPException(
+            status_code=403,
+            detail="Modo demo: renovar links de auditoría está deshabilitado.",
+        )
     a = db.get(Audit, audit_id)
     if not a:
         raise HTTPException(status_code=404, detail="No existe")

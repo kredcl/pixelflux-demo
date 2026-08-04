@@ -94,6 +94,12 @@ def meta_verify(request: Request):
 
 @app.post("/webhooks/meta")
 async def meta_webhook(request: Request, db: Session = Depends(lambda: next(get_db()))):
+    if DEMO_READONLY:
+        # Modo demo: nadie (ni Meta) debería estar llamando a este webhook,
+        # pero al no tener verificación de firma, queda abierto a que un
+        # visitante inyecte mensajes falsos en el inbox simulado. Sin efecto
+        # en la demo pública: se rechaza igual que el resto de escrituras.
+        raise HTTPException(status_code=403, detail="Modo demo: webhook deshabilitado.")
     data = await request.json()
     print("WEBHOOK META:", data)
 

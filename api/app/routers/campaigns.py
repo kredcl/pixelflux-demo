@@ -28,6 +28,13 @@ from app.models import (
 
 router = APIRouter(prefix="/campaigns", tags=["campaigns"])
 
+# En el demo público, cualquier escritura sobre campañas (crear, editar,
+# borrar, asignar/quitar leads, generar o editar mensajes de outreach) queda
+# deshabilitada — sin esto, un visitante sin login podría desfigurar el
+# contenido sembrado pegándole directo al endpoint (ver DEMO_READONLY en
+# main.py / scraper.py / leads.py).
+DEMO_READONLY = os.getenv("DEMO_READONLY", "true").lower() == "true"
+
 
 # Pydantic Schemas
 # -----------------------------
@@ -339,6 +346,11 @@ def campaigns_dashboard(db: Session = Depends(get_db)):
 
 @router.post("", response_model=CampaignOut)
 def create_campaign(payload: CampaignCreate, db: Session = Depends(get_db)):
+    if DEMO_READONLY:
+        raise HTTPException(
+            status_code=403,
+            detail="Modo demo: crear campañas nuevas está deshabilitado. Las campañas que ves fueron precargadas al construir la demo.",
+        )
     # Nombre único (por conveniencia)
     existing = db.query(Campaign).filter(Campaign.name == payload.name).first()
     if existing:
@@ -570,6 +582,11 @@ def get_campaign(campaign_id: int, db: Session = Depends(get_db)):
 
 @router.patch("/{campaign_id}", response_model=CampaignOut)
 def update_campaign(campaign_id: int, payload: CampaignUpdate, db: Session = Depends(get_db)):
+    if DEMO_READONLY:
+        raise HTTPException(
+            status_code=403,
+            detail="Modo demo: editar campañas (nombre, descripción, estado, CTA) está deshabilitado. El contenido que ves fue precargado al construir la demo.",
+        )
     c = db.get(Campaign, campaign_id)
     if not c:
         raise HTTPException(status_code=404, detail="Campaña no encontrada.")
@@ -604,6 +621,11 @@ def update_campaign(campaign_id: int, payload: CampaignUpdate, db: Session = Dep
 
 @router.delete("/{campaign_id}")
 def delete_campaign(campaign_id: int, db: Session = Depends(get_db)):
+    if DEMO_READONLY:
+        raise HTTPException(
+            status_code=403,
+            detail="Modo demo: eliminar campañas está deshabilitado.",
+        )
     c = db.get(Campaign, campaign_id)
     if not c:
         raise HTTPException(status_code=404, detail="Campaña no encontrada.")
@@ -632,6 +654,11 @@ def delete_campaign(campaign_id: int, db: Session = Depends(get_db)):
 
 @router.post("/{campaign_id}/leads")
 def add_leads_to_campaign(campaign_id: int, body: LeadIdsIn, db: Session = Depends(get_db)):
+    if DEMO_READONLY:
+        raise HTTPException(
+            status_code=403,
+            detail="Modo demo: agregar leads a una campaña está deshabilitado.",
+        )
     c = db.get(Campaign, campaign_id)
     if not c:
         raise HTTPException(status_code=404, detail="Campaña no encontrada.")
@@ -677,6 +704,11 @@ def add_leads_to_campaign_alias(campaign_id: int, body: LeadIdsIn, db: Session =
 
 @router.delete("/{campaign_id}/leads")
 def remove_leads_from_campaign(campaign_id: int, body: LeadIdsIn, db: Session = Depends(get_db)):
+    if DEMO_READONLY:
+        raise HTTPException(
+            status_code=403,
+            detail="Modo demo: quitar leads de una campaña está deshabilitado.",
+        )
     # Elimina SOLO si pertenecen a esta campaña
     q = db.query(CampaignLead).filter(
         CampaignLead.campaign_id == campaign_id,
@@ -856,6 +888,11 @@ def generate_messages_for_campaign(
     - Placeholders usados: {name}, {audit_url}.
     - Shuffle estable por campaña.
     """
+    if DEMO_READONLY:
+        raise HTTPException(
+            status_code=403,
+            detail="Modo demo: generar mensajes de outreach está deshabilitado. Los mensajes que ves ya fueron generados al sembrar la demo.",
+        )
     camp = db.get(Campaign, campaign_id)
     if not camp:
         raise HTTPException(status_code=404, detail="No existe la campaña")
@@ -992,6 +1029,11 @@ def update_campaign_lead_message(
     payload: MessageUpdateIn,
     db: Session = Depends(get_db),
 ):
+    if DEMO_READONLY:
+        raise HTTPException(
+            status_code=403,
+            detail="Modo demo: editar el mensaje de outreach de un lead está deshabilitado.",
+        )
     cl = (
         db.query(CampaignLead)
         .filter(CampaignLead.campaign_id == campaign_id, CampaignLead.place_id == place_id)

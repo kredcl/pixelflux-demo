@@ -35,8 +35,18 @@ from app.routers.leads import (
     _compute_score_and_issues,
     _has_whatsapp_in_url,
 )
+import app.routers.audits as audits_router
+import app.routers.campaigns as campaigns_router
 from app.routers.audits import generate_basic_for_campaign, generate_premium_for_campaign
 from app.routers.campaigns import generate_messages_for_campaign
+
+# Este script llama a las funciones de escritura reales directamente (no vía
+# HTTP), para seguir generando la data sembrada con el mismo código real de
+# producción. DEMO_READONLY sigue protegiendo esos endpoints del resto del
+# mundo (ver routers/audits.py y routers/campaigns.py) -- solo se desactiva
+# acá, en el proceso aislado del seeding, nunca en el servidor que sirve la API.
+audits_router.DEMO_READONLY = False
+campaigns_router.DEMO_READONLY = False
 
 random.seed(42)  # reproducible dataset across re-seeds
 

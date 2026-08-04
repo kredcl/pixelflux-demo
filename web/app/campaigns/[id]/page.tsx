@@ -785,14 +785,10 @@ export default function CampaignDetailPage() {
             </div>
             <textarea
               value={camp?.description || ""}
-              onChange={(e) =>
-                setCamp((c) =>
-                  c ? { ...c, description: e.target.value } : c
-                )
-              }
-              onBlur={() => saveCampaign({ description: camp?.description || null })}
+              readOnly
+              title="Editing is disabled in this public demo"
               placeholder="Campaign description…"
-              className="w-[680px] max-w-full rounded-md border p-2 bg-white text-sm"
+              className="w-[680px] max-w-full rounded-md border p-2 bg-slate-50 text-sm text-slate-600 cursor-not-allowed"
               rows={2}
             />
           </div>
@@ -969,6 +965,16 @@ export default function CampaignDetailPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Por qué existen dos niveles de auditoría */}
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600 leading-relaxed">
+          <span className="font-semibold text-slate-700">Why two audit tiers? </span>
+          The Basic audit is free and sent as the opening move — it shows a prospect
+          we&apos;ve already found real, concrete opportunities, before asking for
+          anything in return. The Premium audit is held back until after the meeting
+          is booked, so it can do its job: giving the conversation a reason to keep
+          moving toward a proposal.
         </div>
 
         {/* Sección: Performance de auditorías básicas (funnel) */}
