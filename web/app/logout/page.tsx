@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 
 export default function LogoutPage() {
-  const API = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.pixelfluxcreative.com";
+  const API = process.env.NEXT_PUBLIC_API_BASE_URL || "https://demo-api.pixelfluxcreative.com";
   useEffect(() => {
     fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" })
       .finally(() => setTimeout(() => { window.location.href = "/"; }, 1000));

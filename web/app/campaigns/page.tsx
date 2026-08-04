@@ -90,7 +90,7 @@ type CampaignsDashboardData = {
 const API =
   (process.env.NEXT_PUBLIC_API_BASE_URL as string) ||
   (process.env.NEXT_PUBLIC_API_BASE as string) ||
-  "https://api.pixelfluxcreative.com";
+  "https://demo-api.pixelfluxcreative.com";
 
 // Display labels for campaign status codes (the codes themselves stay as the
 // backend's literal values; only what's shown to the user is translated).

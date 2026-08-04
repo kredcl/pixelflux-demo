@@ -28,6 +28,7 @@ from app.models import (
     Message,
     Audit,
     AuditKind,
+    AuditCTAVariant,
 )
 from app.routers.leads import (
     _classify_website,
@@ -37,7 +38,7 @@ from app.routers.leads import (
 )
 import app.routers.audits as audits_router
 import app.routers.campaigns as campaigns_router
-from app.routers.audits import generate_basic_for_campaign, generate_premium_for_campaign
+from app.routers.audits import generate_basic_for_campaign, generate_premium_for_campaign, _build_payload
 from app.routers.campaigns import generate_messages_for_campaign
 
 # Este script llama a las funciones de escritura reales directamente (no vía
@@ -531,6 +532,29 @@ def run():
         # Real audit generation (same code path as production)
         basic_res = generate_basic_for_campaign(campaign_id=camp.id, days_valid=30, db=db)
         print(f"[seed_demo] Basic audits: {basic_res}")
+
+        # The campaign's cta_basic_variant is "whatsapp_premium", so every
+        # basic audit above got that variant. Force two of them onto the
+        # other two CTA variants so calendar/whatsapp_direct actually exist
+        # in the seeded dataset and can be checked live (they're rendered
+        # by the same non-navigating CTA component either way, but until
+        # now nothing in the demo actually exercised those two code paths).
+        variant_overrides = [AuditCTAVariant.CALENDAR, AuditCTAVariant.WHATSAPP_DIRECT]
+        basic_audits = (
+            db.query(Audit)
+            .filter(Audit.campaign_id == camp.id, Audit.kind == AuditKind.BASIC)
+            .order_by(Audit.id)
+            .limit(len(variant_overrides))
+            .all()
+        )
+        for variant, audit in zip(variant_overrides, basic_audits):
+            audit.cta_variant = variant
+            payload = _build_payload(db, audit.place_id, AuditKind.BASIC, camp, variant)
+            audit.payload_json = json.dumps(payload, ensure_ascii=False)
+            audit.generated_at = datetime.utcnow()
+            db.add(audit)
+        db.commit()
+        print(f"[seed_demo] CTA variant coverage: {[(a.place_id, v.value) for v, a in zip(variant_overrides, basic_audits)]}")
 
         premium_targets = [sr.place_id for sr, la, _wt in targeted if la.score >= 70][:8]
         if premium_targets:

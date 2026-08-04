@@ -6,7 +6,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const API = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.pixelfluxcreative.com";
+  const API = process.env.NEXT_PUBLIC_API_BASE_URL || "https://demo-api.pixelfluxcreative.com";
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();

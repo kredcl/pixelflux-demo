@@ -6,7 +6,7 @@ import NewsFeed from "../../components/NewsFeed";
 export default function Panel() {
   const [me, setMe] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const API = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.pixelfluxcreative.com";
+  const API = process.env.NEXT_PUBLIC_API_BASE_URL || "https://demo-api.pixelfluxcreative.com";
 
   useEffect(() => {
     fetch(`${API}/me`, { credentials: "include" })

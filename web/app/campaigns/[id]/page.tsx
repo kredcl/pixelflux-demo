@@ -86,10 +86,10 @@ type AuditLinkMap = Record<string, { basic?: LinkInfo; premium?: LinkInfo }>;
 const API =
   (process.env.NEXT_PUBLIC_API_BASE_URL as string) ||
   (process.env.NEXT_PUBLIC_API_BASE as string) ||
-  "https://api.pixelfluxcreative.com";
+  "https://demo-api.pixelfluxcreative.com";
 
 const DEFAULT_AUDIT_HOST =
-  process.env.NEXT_PUBLIC_AUDIT_HOST || "https://audit.pixelfluxcreative.com";
+  process.env.NEXT_PUBLIC_AUDIT_HOST || "https://demo.pixelfluxcreative.com";
 
 // Display labels for campaign status codes (the codes themselves stay as the
 // backend's literal values; only what's shown to the user is translated).
@@ -700,7 +700,7 @@ export default function CampaignDetailPage() {
           <input
             value={auditHost}
             onChange={(e) => setAuditHost(e.target.value)}
-            placeholder="https://audit.pixelfluxcreative.com"
+            placeholder="https://demo.pixelfluxcreative.com"
             className="w-full text-[12px] rounded-md border px-2 py-1 bg-white text-dark"
           />
           <div className="grid grid-cols-2 gap-2">

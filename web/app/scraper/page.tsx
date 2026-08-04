@@ -37,7 +37,10 @@ type Row = {
   owner_responses_count?: number;   // cuántas tienen respuesta del negocio
 };
 
-const API = process.env.NEXT_PUBLIC_API_BASE || "https://api.pixelfluxcreative.com";
+const API =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_BASE ||
+  "https://demo-api.pixelfluxcreative.com";
 
 const CANADIAN_CITIES: Record<string, string> = {
   "CA-VAN": "Vancouver",

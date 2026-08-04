@@ -4,19 +4,11 @@
 import { useEffect, useState } from "react";
 
 const API =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.pixelfluxcreative.com";
-const WABA_URL = process.env.NEXT_PUBLIC_WABA_URL || "/waba";
-const CALENDAR_URL =
-  process.env.NEXT_PUBLIC_CALENDAR_URL || "https://calendar.google.com";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://demo-api.pixelfluxcreative.com";
 
-// Demo-safe placeholder — not a real number. In production this points to a
-// real sales phone number via NEXT_PUBLIC_WHATSAPP_TO.
-const WHATSAPP_TO =
-  process.env.NEXT_PUBLIC_WHATSAPP_TO || "10000000000"; // no leading +, includes country code
-
-function waMeLink(text: string) {
-  return `https://wa.me/${WHATSAPP_TO}?text=${encodeURIComponent(text)}`;
-}
+// None of the audit CTAs navigate anywhere in this demo — in the real
+// system they'd open WhatsApp or a calendar booking link, but here they
+// only show DemoActionModal explaining what would happen instead.
 
 type AuditPayload = {
   headline?: string;
@@ -74,6 +66,7 @@ export default function AuditBasicClient({ token }: { token: string }) {
   const [data, setData] = useState<AuditPayload | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [demoModal, setDemoModal] = useState<{ title: string; body: string } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -329,11 +322,6 @@ export default function AuditBasicClient({ token }: { token: string }) {
   // --------- CTA components ---------
 
   function CtaWhatsAppPremium() {
-    const prefill = `Hi, I just saw my basic audit for ${business.name}${
-      business.city ? " in " + business.city : ""
-    } and I'd like to review the Premium version with you.`;
-    const href = waMeLink(prefill);
-
     return (
       <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 mt-4">
         <div className="font-semibold text-emerald-900">
@@ -345,13 +333,18 @@ export default function AuditBasicClient({ token }: { token: string }) {
           against your competition and what type of website makes the most
           sense for your business.
         </p>
-        <a
-          href={href}
-          onClick={() => trackCtaClick("basic_whatsapp_premium")}
+        <button
+          onClick={() => {
+            trackCtaClick("basic_whatsapp_premium");
+            setDemoModal({
+              title: "This would open WhatsApp",
+              body: "In the real system, this button sends a WhatsApp message to the business to schedule an introductory call. This is a public demo, so it doesn't navigate anywhere or send real messages.",
+            });
+          }}
           className="inline-block mt-3 rounded-lg bg-emerald-600 text-white px-4 py-2 text-sm font-medium hover:bg-emerald-700 transition"
         >
           See the full version on WhatsApp
-        </a>
+        </button>
       </div>
     );
   }
@@ -367,25 +360,23 @@ export default function AuditBasicClient({ token }: { token: string }) {
           we go through your full audit and show you what type of website
           could help you most. No obligation.
         </p>
-        <a
-          href={CALENDAR_URL}
-          onClick={() => trackCtaClick("basic_calendar")}
-          target="_blank"
-          rel="noreferrer"
+        <button
+          onClick={() => {
+            trackCtaClick("basic_calendar");
+            setDemoModal({
+              title: "This would open a calendar booking page",
+              body: "In the real system, this button opens a calendar so the business can book a free 15-minute review. This is a public demo, so it doesn't navigate anywhere.",
+            });
+          }}
           className="inline-block mt-3 rounded-lg bg-sky-600 text-white px-4 py-2 text-sm font-medium hover:bg-sky-700 transition"
         >
           Book my FREE review
-        </a>
+        </button>
       </div>
     );
   }
 
   function CtaWhatsAppDirect() {
-    const prefill = `Hi, I saw my basic audit for ${business.name}${
-      business.city ? " in " + business.city : ""
-    } and I'd like you to walk me through it on WhatsApp with a quick call or voice note.`;
-    const href = waMeLink(prefill);
-
     return (
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 mt-4">
         <div className="font-semibold text-amber-900">
@@ -396,13 +387,46 @@ export default function AuditBasicClient({ token }: { token: string }) {
           quick call) so you can quickly understand what you're missing out on
           today and what you could improve.
         </p>
-        <a
-          href={href}
-          onClick={() => trackCtaClick("basic_whatsapp_direct")}
+        <button
+          onClick={() => {
+            trackCtaClick("basic_whatsapp_direct");
+            setDemoModal({
+              title: "This would open WhatsApp",
+              body: "In the real system, this button sends a WhatsApp message to the business to schedule an introductory call. This is a public demo, so it doesn't navigate anywhere or send real messages.",
+            });
+          }}
           className="inline-block mt-3 rounded-lg bg-amber-600 text-white px-4 py-2 text-sm font-medium hover:bg-amber-700 transition"
         >
           Walk me through it
-        </a>
+        </button>
+      </div>
+    );
+  }
+
+  function DemoActionModal() {
+    if (!demoModal) return null;
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+        onClick={() => setDemoModal(null)}
+      >
+        <div
+          className="max-w-sm w-full rounded-xl bg-white shadow-lg p-5"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h3 className="text-base font-semibold text-slate-900">
+            {demoModal.title}
+          </h3>
+          <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+            {demoModal.body}
+          </p>
+          <button
+            onClick={() => setDemoModal(null)}
+            className="mt-4 w-full rounded-lg bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-800 transition"
+          >
+            Got it
+          </button>
+        </div>
       </div>
     );
   }
@@ -728,6 +752,7 @@ export default function AuditBasicClient({ token }: { token: string }) {
           </div>
         </section>
       </div>
+      <DemoActionModal />
     </main>
   );
 }

@@ -156,7 +156,10 @@ type RankingItem = {
   needs_reanalysis: boolean;
 };
 
-const API = process.env.NEXT_PUBLIC_API_BASE || "https://api.pixelfluxcreative.com";
+const API =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_BASE ||
+  "https://demo-api.pixelfluxcreative.com";
 
 export default function LeadsPage() {
   // métricas

@@ -4,8 +4,10 @@
 import { useEffect, useState } from "react";
 
 const API =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.pixelfluxcreative.com";
-const WABA_URL = process.env.NEXT_PUBLIC_WABA_URL || "/waba";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://demo-api.pixelfluxcreative.com";
+
+// The final CTA doesn't navigate anywhere in this demo — in the real system
+// it opens a WhatsApp conversation, but here it only shows DemoActionModal.
 
 type Benchmark = {
   name: string;
@@ -53,6 +55,7 @@ export default function AuditPremiumClient({ token }: { token: string }) {
   const [data, setData] = useState<AuditPremiumPayload | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [demoModal, setDemoModal] = useState<{ title: string; body: string } | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -183,10 +186,33 @@ export default function AuditPremiumClient({ token }: { token: string }) {
     "If applicable, prepare a small perk or promotion for people who contact you directly via WhatsApp or the website.",
   ];
 
-  const prefill = `Hi, I just saw my Premium audit for ${business.name}${
-    business.city ? " in " + business.city : ""
-  } and I'd like to see options for implementing the plan you showed me.`;
-  const wabaHref = `${WABA_URL}?text=${encodeURIComponent(prefill)}`;
+  function DemoActionModal() {
+    if (!demoModal) return null;
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+        onClick={() => setDemoModal(null)}
+      >
+        <div
+          className="max-w-sm w-full rounded-xl bg-white shadow-lg p-5"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h3 className="text-base font-semibold text-slate-900">
+            {demoModal.title}
+          </h3>
+          <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+            {demoModal.body}
+          </p>
+          <button
+            onClick={() => setDemoModal(null)}
+            className="mt-4 w-full rounded-lg bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-800 transition"
+          >
+            Got it
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -393,15 +419,21 @@ export default function AuditPremiumClient({ token }: { token: string }) {
               what type of website makes the most sense for your business and
               go over 2-3 investment options.
             </p>
-            <a
-              href={wabaHref}
+            <button
+              onClick={() =>
+                setDemoModal({
+                  title: "This would open WhatsApp",
+                  body: "In the real system, this button opens a WhatsApp conversation to finalize the meeting and move toward closing the deal. This is a public demo, so it doesn't navigate anywhere or open real conversations.",
+                })
+              }
               className="inline-block mt-4 rounded-lg bg-emerald-600 text-white px-4 py-2 text-sm font-medium hover:bg-emerald-700 transition"
             >
               I want to see options to implement this
-            </a>
+            </button>
           </div>
         </section>
       </div>
+      <DemoActionModal />
     </main>
   );
 }

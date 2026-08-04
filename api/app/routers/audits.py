@@ -24,6 +24,12 @@ from app.routers.leads import _order_nulls_last
 
 router = APIRouter(prefix="/audits", tags=["audits"])
 
+# Host público de las auditorías (mismo valor que usa campaigns.py para las
+# plantillas de outreach). Antes list_links_for_campaign() hardcodeaba el
+# dominio de producción (audit.pixelfluxcreative.com) en vez de leer esto,
+# así que el panel de campañas mostraba/copiaba links al dominio real.
+AUDIT_HOST = os.getenv("AUDIT_HOST", "https://demo.pixelfluxcreative.com").rstrip("/")
+
 # Generar nuevos links de auditoría, o revocar/renovar los existentes, muta
 # estado que un visitante sin login podría alcanzar directo por API — se
 # deshabilita en modo demo igual que el resto de escrituras (ver
@@ -664,8 +670,8 @@ def list_links_for_campaign(
     kind: AuditKind,
     db: Session = Depends(get_db),
 ):
-    base_basic = "https://audit.pixelfluxcreative.com/a/"
-    base_prem = "https://audit.pixelfluxcreative.com/p/"
+    base_basic = f"{AUDIT_HOST}/a/"
+    base_prem = f"{AUDIT_HOST}/p/"
 
     audits: List[Audit] = (
         db.query(Audit)

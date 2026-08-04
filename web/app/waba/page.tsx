@@ -23,7 +23,7 @@ function Tick({ status }: { status?: string | null }) {
 }
 
 export default function WabaPage() {
-  const API = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.pixelfluxcreative.com";
+  const API = process.env.NEXT_PUBLIC_API_BASE_URL || "https://demo-api.pixelfluxcreative.com";
 
   // Estado base
   const [contacts, setContacts]   = useState<Contact[]>([]);
